@@ -1,41 +1,25 @@
 import express from 'express';
+import {Chats} from "../models/chats.js";
 
 const router = express.Router();
 
-let chats = [];
-
 router
-    .get('/', (req, res) => {
-        res.send(chats)
+    .get('/', async (req, res) => {
+        const chats = await Chats.find();
+        res.json(chats);
     })
-    .post('/', (req, res) => {
-        chats.push(req.body);
+    .post('/', async (req, res) => {
+        const newChat = await Chats.create(req.body)
         res.status(201);
-        res.send('ok');
+        res.json(newChat);
     })
-    .delete('/:id', (req, res) => {
-        console.log(req.params.id);
-        chats = chats.filter((chat) => chat.id !== req.params.id);
-
-        res.send('ok');
+    .delete('/:id', async (req, res) => {
+        const deleted = await Chats.findByIdAndDelete(req.params.id)
+        res.json(deleted);
     })
-    .put('/:id', (req, res) => {
-        console.log(req.params.id)
-        console.log(req.body.name)
-
-        chats = chats.map(chat => {
-            if (chat.id === req.params.id) {
-                return {
-                    id: chat.id,
-                    name: req.body.name
-                }
-            } else {
-                return chat
-            }
-        });
-
-        res.status(201);
-        res.send('ok');
+    .put('/:id', async (req, res) => {
+        const updateChat = await Chats.findByIdAndUpdate(req.params.id, req.body)
+        res.json(updateChat);
     });
 
 export default router;

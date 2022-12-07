@@ -1,10 +1,29 @@
 import express from 'express';
+import {Messages} from "../models/messages.js";
 
 const router = express.Router();
 
 let messages = {};
 
 router
+    .get('/', async (req, res) => {
+        const messages = await Messages.find();
+        res.json(messages);
+    })
+    .post('/', async (req, res) => {
+        try {
+            const newMessage = await Messages.create({
+                chatId: "1",
+                author: "user",
+                // text: "some text"
+            })
+            res.json(newMessage);
+        } catch (error) {
+            res.status(500); //заглушка
+            res.send(error)
+        }
+
+    })
     .get('/:chatId', (req, res) => {
         //провечерка на undef
         res.send(messages[req.params.chatId])
