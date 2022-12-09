@@ -9,9 +9,14 @@ router
         res.json(chats);
     })
     .post('/', async (req, res) => {
-        const newChat = await Chats.create(req.body)
-        res.status(201);
-        res.json(newChat);
+        try {
+            const newChat = await Chats.create(req.body)
+            res.status(201);
+            res.json(newChat);
+        } catch (error) {
+            res.status(500); //заглушка
+            res.send(error)
+        }
     })
     .delete('/:id', async (req, res) => {
         const deleted = await Chats.findByIdAndDelete(req.params.id)
