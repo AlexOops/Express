@@ -4,19 +4,20 @@ import {Chats} from "../models/chats.js";
 const router = express.Router();
 
 router
-    .get('/', async (req, res) => {
+    .get('/', async (req, res, next) => {
+        next(new Error("some error"));
         const chats = await Chats.find();
         res.json(chats);
     })
-    .post('/', async (req, res) => {
-        try {
-            const newChat = await Chats.create(req.body)
-            res.status(201);
-            res.json(newChat);
-        } catch (error) {
-            res.status(500); //заглушка
-            res.send(error)
-        }
+    .post('/', async (req, res, next) => {
+        await Chats.create(req.body, (error, newChat = Chats) => {
+            if (error) {
+                next(error);
+            }
+
+            res.status(201); //заглушка
+            res.send(newChat)
+        });
     })
     .delete('/:id', async (req, res) => {
         const deleted = await Chats.findByIdAndDelete(req.params.id)
