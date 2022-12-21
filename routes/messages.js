@@ -1,38 +1,37 @@
 import express from 'express';
+import {Messages} from "../models/messages.js";
 
 const router = express.Router();
 
-let messages = {};
-
 router
-    .get('/:chatId', (req, res) => {
-        //провечерка на undef
-        res.send(messages[req.params.chatId])
+    // все мессаги
+    .get('/', async (req, res) => {
+        const messages = await Messages.find();
+        res.json(messages);
     })
-    .post('/:chatId', (req, res) => {
-        let newMessages = req.body
-        messages[req.params.chatId].push(newMessages);
-        res.status(201);
-        res.send('ok');
+    .post('/', async (req, res) => {
+        try {
+            const newMessage = await Messages.create(req.body)
+            res.json(newMessage);
+        } catch (error) {
+            res.status(500); //заглушка
+            res.send(error)
+        }
     })
-    .delete('/:chatId/:messageId', (req, res) => {
-        console.log(req.params.messageId);
-        messages[req.params.chatId] = messages[req.params.chatId].filter(
-            (message) => message.id !== req.params.messageId);
+    //все мессаги чата
+    .get('/:chatId', async (req, res) => {
+        const messages = await Messages.find({chatId: req.params.chatId});
+        res.json(messages);
+    })
+    .delete('/:messageId', async (req, res) => {
+        const deleted = await Messages.findByIdAndDelete(req.params.messageId)
+        res.json(deleted);
+    })
+    .put('/:messageId', async (req, res) => {
+        const updateMessage = await Messages.findByIdAndUpdate(req.params.messageId, req.body)
+        res.json(updateMessage);
 
-        res.send('ok');
-    })
-    .put('/:chatId/:messageId', (req, res) => {
-        messages[req.params.chatId] = messages[req.params.chatId].map(message => {
-            if (message.id === req.params.messageId) {
-                return req.body
-            } else {
-                return message
-            }
-        });
-
         res.status(201);
-        res.send('ok');
     });
 
 export default router;
