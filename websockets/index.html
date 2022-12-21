@@ -75,21 +75,25 @@
     const input = document.querySelector('#input');
     const button = document.querySelector('#button');
 
-    socket.on("connect", () => {
+    socket.on('connect', () => {
         console.log("connected");
     });
 
-    socket.on("connect_error", (err) => {
+    socket.on('connect_error', (err) => {
         console.log(`connect_error due to ${err.message}`);
     });
 
     button.addEventListener('click', (e) => {
         e.preventDefault();
         const data = {
-            input: input.value
+            message: input.value
         }
         socket.emit('client-msg', data);
     })
+
+    socket.on('client-msg', ({message}) => {
+        messages.insertAdjacentHTML('afterbegin', `<div>${message}</div>`);
+    });
 
 
 </script>

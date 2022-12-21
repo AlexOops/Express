@@ -60,6 +60,7 @@ router
 
         if (refreshToken) {
             const decodeToken = jwt.decode(refreshToken);
+            //TODO generate a new update token
             const updatedToken = await Tokens.findOne({token: refreshToken, expiresIn: true});
 
             if (updatedToken) {
